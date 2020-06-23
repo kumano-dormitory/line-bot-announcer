@@ -13,6 +13,14 @@
 
 LINE Botが、自分の所属している全てのグループのgroup IDを取得する必要がある。そこからSCラインを除いた全てのグループにメッセージを送信する。
 
+## 確認すること
+
+- グループに参加したことをイベントとして受け取る方法
+- 脱退をイベントとして受け取る方法  
+-> [ここに書いてある](https://developers.line.biz/ja/reference/messaging-api/#join-event)
+
+- GAEでデータベースを使う方法
+
 ## 参考文献
 
 - [公式ドキュメント](https://godoc.org/github.com/line/line-bot-sdk-go/linebot)
