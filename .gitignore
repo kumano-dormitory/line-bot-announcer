@@ -17,3 +17,4 @@
 secret.yaml
 line-bot-accouncer
 *.gcloudignore
+*.DS_Store

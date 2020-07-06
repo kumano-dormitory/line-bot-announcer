@@ -74,3 +74,9 @@ func leaveGroup(bot *linebot.Client, eventSource *linebot.EventSource) {
 		}
 	}
 }
+
+// データベースにグループIDを登録する
+func registerGroupID() {}
+
+// データベースからグループIDを削除する
+func deleteGropID() {}
