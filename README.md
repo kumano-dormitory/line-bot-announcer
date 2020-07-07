@@ -20,8 +20,11 @@
   -> [ここに書いてある](https://developers.line.biz/ja/reference/messaging-api/#join-event)
 - ボタンの表示について  
   -> [ここがすごく参考になる](https://blog.kazu634.com/labs/golang/2019-02-23-line-sdk-go/)
-- GAE でデータベースを使う方法・メンションを検知する方法  
+- メンションを検知する方法  
   -> [参考](https://www.nowsprinting.com/entry/2017/10/01/005607)
+- GAE でデータベースを使う方法
+- 受け取ったメッセージを別のグループラインに送信する方法  
+  -> [ああ、神よ](https://developers.line.biz/ja/reference/messaging-api/#send-push-message)
 
 ## 困ったこと
 
