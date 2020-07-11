@@ -15,6 +15,6 @@
 # vendor/
 
 secret.yaml
-line-bot-accouncer
+line-bot-announcer
 *.gcloudignore
 *.DS_Store

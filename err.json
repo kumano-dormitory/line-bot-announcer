@@ -1,0 +1,65 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.appengine.logging.v1.RequestLog",
+    "appId": "b~kumano-announcer-bot",
+    "versionId": "20200708t103752",
+    "requestId": "5f05243b00ff0c8c33db5a811e0001627e6b756d616e6f2d616e6e6f756e6365722d626f740001323032303037303874313033373532000100",
+    "ip": "180.145.28.172",
+    "startTime": "2020-07-08T01:41:15.822323Z",
+    "endTime": "2020-07-08T01:41:16.532851Z",
+    "latency": "0.710528s",
+    "megaCycles": "616",
+    "method": "POST",
+    "resource": "/messages",
+    "httpVersion": "HTTP/1.1",
+    "status": 502,
+    "responseSize": "288",
+    "userAgent": "curl/7.64.1",
+    "urlMapEntry": "auto",
+    "host": "kumano-announcer-bot.an.r.appspot.com",
+    "cost": 4.1842e-8,
+    "wasLoadingRequest": true,
+    "instanceIndex": -1,
+    "finished": true,
+    "instanceId": "00c61b117c5e62d8e84b0260297622899491144731101ccaec402c07e5cd185fc42635b855",
+    "line": [
+      {
+        "time": "2020-07-08T01:41:16.532699Z",
+        "severity": "INFO",
+        "logMessage": "This request caused a new process to be started for your application, and thus caused your application code to be loaded for the first time. This request may thus take longer and use more CPU than a typical request for your application."
+      }
+    ],
+    "appEngineRelease": "1.9.71",
+    "traceId": "999c9b52b63b02ba41591ce67f9c322c",
+    "first": true,
+    "traceSampled": true
+  },
+  "insertId": "5f05243c0008223111c89402",
+  "httpRequest": {
+    "status": 502
+  },
+  "resource": {
+    "type": "gae_app",
+    "labels": {
+      "version_id": "20200708t103752",
+      "project_id": "kumano-announcer-bot",
+      "zone": "asia-northeast1-1",
+      "module_id": "default"
+    }
+  },
+  "timestamp": "2020-07-08T01:41:15.822323Z",
+  "severity": "INFO",
+  "labels": {
+    "clone_id": "00c61b117c5e62d8e84b0260297622899491144731101ccaec402c07e5cd185fc42635b855"
+  },
+  "logName": "projects/kumano-announcer-bot/logs/appengine.googleapis.com%2Frequest_log",
+  "operation": {
+    "id": "5f05243b00ff0c8c33db5a811e0001627e6b756d616e6f2d616e6e6f756e6365722d626f740001323032303037303874313033373532000100",
+    "producer": "appengine.googleapis.com/request_id",
+    "first": true,
+    "last": true
+  },
+  "trace": "projects/kumano-announcer-bot/traces/999c9b52b63b02ba41591ce67f9c322c",
+  "receiveTimestamp": "2020-07-08T01:41:16.535691876Z",
+  "traceSampled": true
+}

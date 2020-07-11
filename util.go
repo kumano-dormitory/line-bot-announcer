@@ -1,9 +1,11 @@
 package main
 
-import "errors"
+import (
+	"errors"
+)
 
 // コレクションline-groupに登録している全てのグループの情報を取得する
-func getAllGroupIDs() ([]Group, error) {
+func getAllGroup() ([]Group, error) {
 	// 大量にデータを取得しすぎて遅くならないようにデータの取得個数を100個までに制限
 	docs, err := client.Collection(collectionName).
 		Limit(100).
@@ -14,13 +16,13 @@ func getAllGroupIDs() ([]Group, error) {
 	}
 
 	groups := make([]Group, len(docs))
-	for _, doc := range docs {
+	for i, doc := range docs {
 		var g Group
 		if err := doc.DataTo(&g); err != nil {
 			return nil, err
 		}
 
-		groups = append(groups, g)
+		groups[i] = g
 	}
 
 	return groups, nil

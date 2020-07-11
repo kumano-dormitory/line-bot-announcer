@@ -59,13 +59,14 @@ func main() {
 		log.Fatal(err)
 		return
 	}
+	defer client.Close()
 
 	// LINEから受け取ったイベントを処理するハンドラを設定する
 	handler.HandleEvents(lineEventsHandler)
 
 	// ハンドラを設定
 	http.Handle("/callback", handler)
-	http.HandleFunc("/reciever", reciever)
+	http.HandleFunc("/messages", reciever)
 
 	// ポート番号を設定
 	port := os.Getenv("PORT")
@@ -75,7 +76,10 @@ func main() {
 
 	// HTTPサーバの起動
 	log.Printf("Listening on port %s", port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
+	if err := http.ListenAndServe(fmt.Sprintf(":%s", port), nil); err != nil {
+		log.Fatal(err)
+		return
+	}
 }
 
 // LINEからイベントを受けとって処理する
@@ -139,12 +143,9 @@ func reciever(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	reply := linebot.NewTextMessage(
-		fmt.Sprintf("%sさんから周知です\n\n%s", r.From, r.Message),
-	)
+	reply := linebot.NewTextMessage(r.Message)
 
-	// TODO:データベースに登録されたグループにメッセージを送信する
-	groups, err := getAllGroupIDs()
+	groups, err := getAllGroup()
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -156,8 +157,16 @@ func reciever(w http.ResponseWriter, req *http.Request) {
 			continue
 		}
 
-		bot.PushMessage(group.ID, reply)
+		if _, err := bot.PushMessage(group.ID, reply).Do(); err != nil {
+			log.Fatal(err)
+			w.WriteHeader(http.StatusNotAcceptable)
+			fmt.Fprintln(w, err)
+			return
+		}
 	}
+
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Success")
 }
 
 // グループ・トークルームから退出させる

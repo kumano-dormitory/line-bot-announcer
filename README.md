@@ -22,7 +22,8 @@
   -> [ここがすごく参考になる](https://blog.kazu634.com/labs/golang/2019-02-23-line-sdk-go/)
 - メンションを検知する方法  
   -> [参考](https://www.nowsprinting.com/entry/2017/10/01/005607)
-- GAE でデータベースを使う方法
+- GAE でデータベースを使う方法  
+  -> [最the高](https://qiita.com/teikoku-penguin/items/b6252cd461b3966d53ac)
 - 受け取ったメッセージを別のグループラインに送信する方法  
   -> [ああ、神よ](https://developers.line.biz/ja/reference/messaging-api/#send-push-message)
 
@@ -32,6 +33,12 @@
   [LINE Developersアカウントでプロバイダーやチャネルが作れないときの対策法](https://qiita.com/hidehiro98/items/4265f42de8e39cb241b6)
 - ただ鸚鵡返しをして欲しいだけなのに変なメッセージがついてきた  
   [LINE Botで「メッセージありがとうございます 申し訳ありませんが...」を返信させなくする方法](https://www.virtual-surfer.com/entry/2018/07/22/190000)
+- GAEに立てたはずのサーバーにPOSTしたら502が帰ってきた  
+  解決できなかったので、GAEからCloud Functionに移行
+
+## URL
+
+- https://us-central1-kumano-announcer-bot.cloudfunctions.net/line-callback
 
 ## 参考文献
 
@@ -39,5 +46,4 @@
 
 - [Golang と Google App Engine を使って LINEBot を作ってみる](https://qiita.com/moja0316/items/a726ef746476fe470a66)
 - [Go で書いた API サーバーを Google App Engine へデプロイするまでの最低限の手順](https://qiita.com/croquette0212/items/1e9df0f25f69b97d06e2)
-- [LINE Bot を使って別グループに代理発言させる方法](https://arukayies.com/gas/line_bot/speak-on-behalf)
 - [Golang で Line API をいじくるよ](https://blog.kazu634.com/labs/golang/2019-02-23-line-sdk-go/)
