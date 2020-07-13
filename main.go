@@ -18,12 +18,16 @@ const (
 	collectionName = "line-groups"
 	onlyBlockGruop = 0
 	allGroups      = 1
+	groupBL        = "BL"    // ブロックライン
+	groupSC        = "SC"    // SCライン
+	groupZR        = "ZR"    // 全寮ライン
+	groupOther     = "Other" // その他のグループ
 )
 
 // Group データベース上でのライングループの表現
 type Group struct {
-	ID       string `firestore:"id"`        // ライングループID
-	IsCenter bool   `firestore:"is_center"` //　全寮ラインかどうかのフラグ
+	ID   string `firestore:"id"`   // ライングループID
+	Type string `firestore:"type"` //　SCライン："SC" | 各ブロックのライン："BL" | 全寮ライン："ZR"
 }
 
 var (
@@ -38,7 +42,7 @@ func init() {
 
 func main() {
 	// HTTP Handlerの初期化
-	handler, err := httphandler.New(
+	lineHandler, err := httphandler.New(
 		os.Getenv("CHANNEL_SECRET"),
 		os.Getenv("CHANNEL_TOKEN"),
 	)
@@ -47,7 +51,7 @@ func main() {
 		return
 	}
 
-	bot, err = handler.NewClient()
+	bot, err = lineHandler.NewClient()
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -62,11 +66,11 @@ func main() {
 	defer client.Close()
 
 	// LINEから受け取ったイベントを処理するハンドラを設定する
-	handler.HandleEvents(lineEventsHandler)
+	lineHandler.HandleEvents(lineEventsHandler)
 
 	// ハンドラを設定
-	http.Handle("/callback", handler)
-	http.HandleFunc("/messages", reciever)
+	http.Handle("/callback", lineHandler)
+	http.HandleFunc("/reciever", reciever)
 
 	// ポート番号を設定
 	port := os.Getenv("PORT")
@@ -92,23 +96,23 @@ func lineEventsHandler(events []*linebot.Event, r *http.Request) {
 			// 入室時に参加したグループのIDを登録する
 			if err := registerGroupID(groupID); err != nil {
 				log.Fatal(err)
-				return
 			}
 
 		case linebot.EventTypeLeave:
 			// 退出時に脱退したグループIDを削除する
 			if err := deleteGropID(groupID); err != nil {
 				log.Fatal(err)
-				return
 			}
 
 		case linebot.EventTypeMessage:
+			// 通常のメッセージを処理する
 			if message, ok := event.Message.(*linebot.TextMessage); ok && message.Text == "leave" {
 				// "leave"というメッセージがきた場合にはグループから退出する
 				if err := leaveGroup(event.Source); err != nil {
 					log.Fatal(err)
-					return
 				}
+
+				continue
 			}
 		}
 	}
@@ -143,48 +147,13 @@ func reciever(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	reply := linebot.NewTextMessage(r.Message)
-
-	groups, err := getAllGroup()
-	if err != nil {
+	if err := sendMessage(r.Message, r.Mode == onlyBlockGruop); err != nil {
 		log.Fatal(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintln(w, err)
 		return
-	}
-
-	for _, group := range groups {
-		// ブロックラインに送るモードの場合はスキップ
-		if r.Mode == onlyBlockGruop && group.IsCenter {
-			continue
-		}
-
-		if _, err := bot.PushMessage(group.ID, reply).Do(); err != nil {
-			log.Fatal(err)
-			w.WriteHeader(http.StatusNotAcceptable)
-			fmt.Fprintln(w, err)
-			return
-		}
 	}
 
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, "Success")
-}
-
-// グループ・トークルームから退出させる
-func leaveGroup(eventSource *linebot.EventSource) (err error) {
-	switch eventSource.Type {
-	case linebot.EventSourceTypeGroup:
-		if _, err = bot.LeaveGroup(eventSource.GroupID).Do(); err != nil {
-			return
-		}
-
-		if err = deleteGropID(eventSource.GroupID); err != nil {
-			return
-		}
-
-	case linebot.EventSourceTypeRoom:
-		_, err = bot.LeaveRoom(eventSource.RoomID).Do()
-		return
-	}
-
-	return
 }
