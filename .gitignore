@@ -16,5 +16,6 @@
 
 secret.yaml
 line-bot-announcer
+message.sh
 *.gcloudignore
 *.DS_Store
