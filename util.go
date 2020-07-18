@@ -38,7 +38,7 @@ func registerGroupID(groupID string) (err error) {
 		Collection(collectionName).
 		Add(ctx, Group{
 			ID:   groupID,
-			Type: groupBL,
+			Type: groupOther,
 		})
 
 	return
