@@ -40,17 +40,11 @@ func fetchTokens() (tokens []string, err error) {
 
 // メッセージを送信する
 func sendMessage(message, from string) error {
-	URL := "https://notify-api.line.me/api/notify"
+	const NotifyAPI = "https://notify-api.line.me/api/notify"
 
 	form := url.Values{
-		"message": {message + "文責:" + from},
+		"message": {fmt.Sprintf("%s\n文責:%s", message, from)},
 	}
-
-	req, err := http.NewRequest("POST", URL, strings.NewReader(form.Encode()))
-	if err != nil {
-		return err
-	}
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	tokens, err := fetchTokens()
 	if err != nil {
@@ -58,6 +52,11 @@ func sendMessage(message, from string) error {
 	}
 
 	for _, token := range tokens {
+		req, err := http.NewRequest(http.MethodPost, NotifyAPI, strings.NewReader(form.Encode()))
+		if err != nil {
+			return err
+		}
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		req.Header.Set("Authorization", "Bearer "+token)
 		// notify apiを叩く
 		res, err := http.DefaultClient.Do(req)
