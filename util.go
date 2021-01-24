@@ -1,112 +1,71 @@
 package main
 
 import (
-	"errors"
-	"log"
+	"context"
+	"fmt"
+	"net/http"
+	"net/url"
+	"os"
+	"strings"
 
-	"github.com/line/line-bot-sdk-go/linebot"
+	"cloud.google.com/go/firestore"
 )
 
-// コレクションline-groupに登録している全てのグループの情報を取得する
-func fetchGroups() ([]Group, error) {
-	// 大量にデータを取得しすぎて遅くならないようにデータの取得個数を100個までに制限
-	docs, err := client.
-		Collection(collectionName).
-		Limit(100).
-		Documents(ctx).
-		GetAll()
+// アクセストークンをデータベースから取得する
+func fetchTokens() (tokens []string, err error) {
+	r := struct {
+		Token string `firestore:"token"`
+	}{}
+
+	ctx := context.Background()
+	// Firestoreのclientを初期化
+	client, err := firestore.NewClient(ctx, os.Getenv("PROJECT_ID"))
+	defer client.Close()
+
+	docs, err := client.Collection("line-notify").Limit(10).Documents(ctx).GetAll()
 	if err != nil {
 		return nil, err
 	}
 
-	groups := make([]Group, len(docs))
-	for i, doc := range docs {
-		var g Group
-		if err := doc.DataTo(&g); err != nil {
+	tokens = make([]string, 0, 10)
+	for _, doc := range docs {
+		if err := doc.DataTo(&r); err != nil {
 			return nil, err
 		}
-
-		groups[i] = g
+		tokens = append(tokens, r.Token)
 	}
 
-	return groups, nil
-}
-
-// データベースにグループIDを登録する
-func registerGroupID(groupID string) (err error) {
-	_, _, err = client.
-		Collection(collectionName).
-		Add(ctx, Group{
-			ID:   groupID,
-			Type: groupOther,
-		})
-
-	return
-}
-
-// データベースからグループIDを削除する
-func deleteGropID(groupID string) error {
-	// GroupIDからドキュメントを一つだけ取得
-	docs, err := client.
-		Collection(collectionName).
-		Where("id", "==", groupID).
-		Limit(1).
-		Documents(ctx).
-		GetAll()
-	if err != nil {
-		return err
-	}
-
-	if len(docs) == 0 {
-		return errors.New("Group ID is not found")
-	}
-
-	_, err = docs[0].Ref.Delete(ctx)
-	return err
-}
-
-// グループ・トークルームから退出させる
-func leaveGroup(eventSource *linebot.EventSource) (err error) {
-	switch eventSource.Type {
-	case linebot.EventSourceTypeGroup:
-		if _, err = bot.LeaveGroup(eventSource.GroupID).Do(); err != nil {
-			return
-		}
-
-		if err = deleteGropID(eventSource.GroupID); err != nil {
-			return
-		}
-
-	case linebot.EventSourceTypeRoom:
-		_, err = bot.LeaveRoom(eventSource.RoomID).Do()
-		return
-	}
-
-	return
+	return tokens, nil
 }
 
 // メッセージを送信する
-func sendMessage(message string, secret bool) error {
-	reply := linebot.NewTextMessage(message)
+func sendMessage(message, from string) error {
+	URL := "https://notify-api.line.me/api/notify"
 
-	groups, err := fetchGroups()
+	form := url.Values{
+		"message": {message + "文責:" + from},
+	}
+
+	req, err := http.NewRequest("POST", URL, strings.NewReader(form.Encode()))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	tokens, err := fetchTokens()
 	if err != nil {
 		return err
 	}
 
-	for _, group := range groups {
-		// SCラインや全寮ライン・ブロックライン以外のグループにはメッセージを送信しない
-		if group.Type == groupSC || group.Type == groupOther {
-			continue
+	for _, token := range tokens {
+		req.Header.Set("Authorization", "Bearer "+token)
+		// notify apiを叩く
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			return err
 		}
-
-		// ブロックラインに送るモードの場合は全寮ラインをスキップ
-		if secret && group.Type == groupZR {
-			continue
-		}
-
-		if _, err := bot.PushMessage(group.ID, reply).Do(); err != nil {
-			log.Println(err)
+		if res.StatusCode != 200 {
+			return fmt.Errorf("notify api status code:%d", res.StatusCode)
 		}
 	}
 
