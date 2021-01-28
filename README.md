@@ -23,15 +23,15 @@
 ## 確認すること
 
 - グループに参加・脱退したことをイベントとして受け取る方法  
-  -> [ここに書いてある](https://developers.line.biz/ja/reference/messaging-api/#join-event)
+  -> [参考](https://developers.line.biz/ja/reference/messaging-api/#join-event)
 - ボタンの表示について  
-  -> [ここがすごく参考になる](https://blog.kazu634.com/labs/golang/2019-02-23-line-sdk-go/)
+  -> [参考](https://blog.kazu634.com/labs/golang/2019-02-23-line-sdk-go/)
 - メンションを検知する方法  
   -> [参考](https://www.nowsprinting.com/entry/2017/10/01/005607)
 - GAE でデータベースを使う方法  
-  -> [最the高](https://qiita.com/teikoku-penguin/items/b6252cd461b3966d53ac)
+  -> [参考](https://qiita.com/teikoku-penguin/items/b6252cd461b3966d53ac)
 - 受け取ったメッセージを別のグループラインに送信する方法  
-  -> [ああ、神よ](https://developers.line.biz/ja/reference/messaging-api/#send-push-message)
+  -> [参考](https://developers.line.biz/ja/reference/messaging-api/#send-push-message)
 
 ## 困ったこと
 
